@@ -15,6 +15,9 @@
  */
 
 var Engine = (function(global) {
+
+    'use strict';
+
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
@@ -40,7 +43,7 @@ var Engine = (function(global) {
     var gameState = {
         'score': 0,
         'highScore': 0
-    }
+    };
 
     //=========================================================
     // HELPER FUNCTIONS
@@ -48,7 +51,7 @@ var Engine = (function(global) {
 
     //helper function to display an animated popup text that appears only for a short while
     function displayText(text, col, row, duration, color) {
-        allTexts.push(new Text(text, col, row, duration, color));
+        allTexts.push(new ScreenText(text, col, row, duration, color));
     }
 
     //shuffles an array
@@ -95,7 +98,7 @@ var Engine = (function(global) {
          * function again as soon as the browser is able to draw another frame.
          */
         win.requestAnimationFrame(main);
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -126,10 +129,10 @@ var Engine = (function(global) {
         updateEntities(dt);
 
         //check for collisions
-        checkCollisions(dt);
+        checkCollisions();
 
         //update game state
-        updateGameState(dt);
+        updateGameState();
     }
 
     /* This is called by the update function  and loops through all of the
@@ -157,7 +160,7 @@ var Engine = (function(global) {
         //update texts
         allTexts.forEach(function(text) {
             text.update(dt);
-        })
+        });
 
         //remove texts that should disappear
         for (var i = allTexts.length - 1; i >= 0; i--) {
@@ -167,10 +170,10 @@ var Engine = (function(global) {
         }
     }
 
-    function checkCollisions(dt) {
+    function checkCollisions() {
 
         //check collision with collectables
-        for (var i = 0; i < allCollectables.length; i++) {
+        for (var i = 0, len = allCollectables.length; i < len; i++) {
             if (allCollectables[i].hasCollidedWith(player)) {
 
                 //hide the collectable
@@ -188,7 +191,7 @@ var Engine = (function(global) {
         }
 
         //check collision with enemies
-        for (var i = 0; i < allEnemies.length; i++) {
+        for (i = 0, len = allEnemies.length; i < len; i++) {
             if (allEnemies[i].hasCollidedWith(player)) {
 
                 //display a popup text
@@ -202,7 +205,7 @@ var Engine = (function(global) {
         }
     }
 
-    function updateGameState(dt) {
+    function updateGameState() {
 
         //check if player has reached goal
         if (player.row === 0) {
@@ -285,13 +288,13 @@ var Engine = (function(global) {
         //render collectables first
         //have to render them row by row from top to bottom so that there won't be strange overlaps
         //1) hash the items into buckets of rows first
-        sorter = {1: [], 2: [], 3: []};
-        for (var i = 0; i < allCollectables.length; i++) {
+        var sorter = {1: [], 2: [], 3: []};
+        for (var i = 0, len = allCollectables.length; i < len; i++) {
             sorter[allCollectables[i].row].push(allCollectables[i]);
         }
         //2) now render the bucketed items row by row, from top (row 1) to bottom (row 3)
-        for (var i = 1; i <= 3; i++) {
-            for (var j = 0; j < sorter[i].length; j++) {
+        for (i = 1; i <= 3; i++) {
+            for (var j = 0, len = sorter[i].length; j < len; j++) {
                 sorter[i][j].render();
             }
         }
@@ -307,7 +310,7 @@ var Engine = (function(global) {
         //render texts last
         allTexts.forEach(function(text) {
             text.render();
-        })
+        });
     }
 
     //=========================================================
@@ -344,16 +347,16 @@ var Engine = (function(global) {
         //create a list of array that goes from [0, 1, ..., 14], then shuffle it.
         //each item represents an index in the possible rock ground position (total of 15).
         //this way, the collectables will not overlap.
-        shuffledList = shuffle(Array.apply(null, {length: 15}).map(Number.call, Number));
+        var shuffledList = shuffle(Array.apply(null, {length: 15}).map(Number.call, Number));
 
         //iterate through all the collectables
-        for (var i = 0; i < allCollectables.length; i++) {
+        for (var i = 0, len = allCollectables.length; i < len; i++) {
 
             //grab an item off the shuffled array according to sequence
             var n = shuffledList[i];
 
             //set col and row based on the index
-            allCollectables[i].setCol(n % 5)
+            allCollectables[i].setCol(n % 5);
             allCollectables[i].setRow(Math.floor(n / 5) + 1);
 
             //set visibility of the collectables according to a predefined probability

@@ -4,17 +4,17 @@
 
 Number.prototype.clamp = function(min, max) {
     return Math.min(Math.max(this, min), max);
-}
+};
 Number.prototype.fit = function(oldMin, oldMax, newMin, newMax) {
     return (this - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
-}
+};
 
 //=========================================================
 // SCREEN ENTITY - SUPER CLASS FOR ALL THINGS THAT APPEAR ON SCREEN
 //=========================================================
 
 //constructor function
-var ScreenEntity = function() {}
+var ScreenEntity = function() {};
 
 //shared properties
 ScreenEntity.prototype.x = 0;  //screen position x
@@ -28,36 +28,36 @@ ScreenEntity.prototype.renderOffsetY = 0;  //used to offset in Y when rendering 
 ScreenEntity.prototype.isVisible = true;
 
 //shared methods
-ScreenEntity.prototype.update = function(dt) {}
+ScreenEntity.prototype.update = function(dt) {};
 ScreenEntity.prototype.render = function() {
     if (this.isVisible) {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
-}
+};
 ScreenEntity.prototype.setCol = function(col) {
     this.col = col;
     this.x = col * 101 + this.renderOffsetX;
-}
+};
 ScreenEntity.prototype.setRow = function(row) {
     this.row = row;
     this.y = row * 83 + this.renderOffsetY;
-}
+};
 ScreenEntity.prototype.hasCollidedWith = function(entity) {
     return (
 
         //condition 1: must be visible
-        (this.isVisible === true)
+        (this.isVisible === true) &&
 
         //condition 2: must be in the same row to collide
-        && (this.row === entity.row)
+        (this.row === entity.row) &&
 
         //to overlap horizontally, two more conditions must hold true at the same time:
         //condition 3A: right edge of this entity is more than the left edge of that entity
-        && ((this.x + 101 - this.collisionAreaMarginRight) > (entity.x + entity.collisionAreaMarginLeft))
+        ((this.x + 101 - this.collisionAreaMarginRight) > (entity.x + entity.collisionAreaMarginLeft)) &&
         //condition 3B: left edge of this entity is less than the right edge of that entity
-        && ((this.x + this.collisionAreaMarginLeft) < (entity.x + 101 - entity.collisionAreaMarginRight))
+        ((this.x + this.collisionAreaMarginLeft) < (entity.x + 101 - entity.collisionAreaMarginRight))
     );
-}
+};
 
 //=========================================================
 // ENEMY CLASS
@@ -72,7 +72,7 @@ var Enemy = function() {
 
     //init
     this.reset();
-}
+};
 
 //inherit from ScreenEntity
 Enemy.prototype = Object.create(ScreenEntity.prototype);
@@ -95,7 +95,7 @@ Enemy.prototype.reset = function() {
 
     //make sure it is out of screen to the left during reset
     this.x = -Math.random().fit(0, 1, this.minInitialDelay, this.maxInitialDelay) * this.speed;
-}
+};
 Enemy.prototype.update = function(dt) {
 
     //add distance to x based on dt
@@ -105,7 +105,7 @@ Enemy.prototype.update = function(dt) {
     if (this.x > canvasWidth) {
         this.reset();
     }
-}
+};
 
 //=========================================================
 // PLAYER CLASS
@@ -119,7 +119,7 @@ var Player = function() {
 
     //init
     this.reset();
-}
+};
 
 //inherit from ScreenEntity
 Player.prototype = Object.create(ScreenEntity.prototype);
@@ -129,7 +129,7 @@ Player.prototype.constructor = Player;
 Player.prototype.reset = function() {
     this.setRow(5);
     this.setCol(2);
-}
+};
 Player.prototype.handleInput = function(keyString) {
     if (keyString !== 'undefined') {
         switch (keyString) {
@@ -147,14 +147,14 @@ Player.prototype.handleInput = function(keyString) {
                 break;
         }
     }
-}
+};
 
 
 
 //=========================================================
 // COLLECTABLE - SUPER CLASS FOR ALL POWER UP ITEMS
 //=========================================================
-var Collectable = function() {}
+var Collectable = function() {};
 Collectable.prototype = Object.create(ScreenEntity.prototype);
 Collectable.prototype.constructor = Collectable;
 Collectable.prototype.renderOffsetY = -32;
@@ -166,7 +166,7 @@ var BlueGem = function() {
     this.sprite = 'images/Gem Blue.png';
     this.points = 1;
     this.appearProbability = 0.6;
-}
+};
 BlueGem.prototype = Object.create(Collectable.prototype);
 BlueGem.prototype.constructor = BlueGem;
 
@@ -177,7 +177,7 @@ var GreenGem = function() {
     this.sprite = 'images/Gem Green.png';
     this.points = 3;
     this.appearProbability = 0.3;
-}
+};
 GreenGem.prototype = Object.create(Collectable.prototype);
 GreenGem.prototype.constructor = GreenGem;
 
@@ -188,7 +188,7 @@ var Star = function() {
     this.sprite = 'images/Star.png';
     this.points = 10;
     this.appearProbability = 0.2;
-}
+};
 Star.prototype = Object.create(Collectable.prototype);
 Star.prototype.constructor = Star;
 
@@ -197,25 +197,25 @@ Star.prototype.constructor = Star;
 //=========================================================
 // TEXT CLASS
 //=========================================================
-var Text = function(text, col, row, duration, color) {
+var ScreenText = function(text, col, row, duration, color) {
     this.text = text;
     this.setCol(col);
     this.setRow(row);
     this.duration = duration;
     this.color = color;
     this.speed = 50;  //pixels per second
-}
-Text.prototype = Object.create(ScreenEntity.prototype);
-Text.prototype.constructor = Text;
-Text.prototype.update = function(dt) {
+};
+ScreenText.prototype = Object.create(ScreenEntity.prototype);
+ScreenText.prototype.constructor = ScreenText;
+ScreenText.prototype.update = function(dt) {
     this.duration -= dt;
     this.y -= this.speed * dt;
-}
-Text.prototype.render = function(dt) {
+};
+ScreenText.prototype.render = function() {
     ctx.font = "30px Arial";
     ctx.fillStyle = this.color;
     ctx.fillText(this.text, this.x + 30, this.y + 120);
-}
+};
 
 
 //=========================================================
