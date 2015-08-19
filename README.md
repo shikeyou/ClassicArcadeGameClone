@@ -10,6 +10,7 @@ Main objectives of this project:
 
 * Given some game assets and a game loop engine, create the classic arcade game Frogger
 * Use object-oriented features of JavaScript to write well-designed classes
+* Work with HTML5 canvas to draw texts and load images
 
 ## Online Live View
 
